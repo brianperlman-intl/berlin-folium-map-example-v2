@@ -1,248 +1,207 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Line Chart of Worldwide Child Mortality</title>
-    <style type="text/css">
-      h2,h3{font-family: Georgia;}
-    </style>
+<head>    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_3d12a7b6808a4b389e0ae962818a45da {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.4.2/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.4.2/Control.FullScreen.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
 </head>
-<body>
-
-<h2>
-Child mortality (0-5 year-olds dying per 1,000 births)
-
-
-</h2>
-<h3>
-  <a href="http://gapm.io/du5mr" target="_blank">Source</a>
-</h3>
-<script src="js/d3.v5.min.js"></script>
-<script type="text/javascript">
-
-var margin = {top:50, right:0, bottom:70, left:70},
-    width  = 900 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
-
-// parse the date / time
-var parseDate = d3.timeParse("%Y")
-
-
-
-//Note: If your x scale is not time data, then you"ll want to use
-// d3.scalePoint() instead for your x variable below
-
-//set the scales based on time
-var x = d3.scaleTime().range([0, width]);
-var y = d3.scaleLinear().range([height, 0]);
-
-
-
-var line = d3.line()
-    .x(function(d) { return x(d.year); })
-    .y(function(d) { return y(d.value); })
-    .curve(d3.curveMonotoneX);
-    //For examples of different curve styles, see:
-    // https://bl.ocks.org/d3noob/ced1b9b18bd8192d2c898884033b5529
-
-var svg = d3.select("body")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom);
-
-var chart = svg.append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-d3.csv("child_mort.csv").then(function(data) {
-
-
-
-  
-
-  //console.log(data);
-
-    var fixedData = [];
-// set up fixedData, countries as columns and years as rows.
-    data.columns.forEach(function(d) {
-      if(d != "country" && +d > 1950)
-        data.forEach(function(k) {
-          fixedData.push({year: parseDate(+d), country: k.country,value:+k[d]})
-        });
-    });
-
-    // fixedData=fixedData.filter(function(d){
-    //   return d.country=="Kenya"
-    // });
-
-  
-    d3.selection.prototype.moveToFront = function() {
-      return this.each(function(){
-      this.parentNode.appendChild(this);
-      });
-    };
-
-    x.domain(d3.extent(fixedData, function(d) { return d.year; }));
-    y.domain(d3.extent(fixedData, function(d) { return d.value; }));
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(" + margin.left + "," + (height + margin.top) + ")")
-        .call(d3.axisBottom(x));
-
-    svg.append("rect")
-       .attr("x",margin.left)
-       .attr("y",margin.top)
-       .attr("width",20)
-       .attr("height",145)
-       .attr("fill","white")
-       .attr("opacity",.8)
-
-    svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .call(d3.axisLeft(y))
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .style("fill", "black")
-        .text("child mortality (Per 1,000 births)");
-
-
-
-var nested = d3.nest()
-  .key(function(d){return d.country;})
-  .entries(fixedData)
-
-
-  //console.log(nested);
-var timer;
-
-    chart.selectAll("path")
-        .data(nested)
-        .enter()
-        .append("path")
-        .attr("class", "line")
-        .attr("d", function(d){ return line(d.values)})
-        .style("stroke","steelblue")
-        .style("stroke-width","1.5px")
-        .style("fill","none")
-        .on("mouseover",function(d){
-         // this removes timer that turns them all blue
-          clearTimeout(timer)
-         // this turns all lines grey
-          d3.selectAll("path")
-            .style("stroke","#cccccc")
-        // this turns them orange on hover
-          d3.select(this)
-            .style("stroke","orange")
-            .style("stroke-width","5px")
-            .moveToFront();
-
-          d3.select("h2")
-            .text(d.key)
-
-            console.log(d)
-
-        })
-
-        .on("mouseout",function(){
-            d3.selectAll("path")
-              .style("stroke-width","1.5px")
-            d3.select("h2")
-              .text("Child mortality (0-5 year-olds dying per 1,000 births)")
-          clearTimeout(timer)
-          timer = window.setTimeout(function(){
-                 d3.selectAll("path")
-              .style("stroke","steelblue")
-          },500)
-         
-
-              
-
-        });
-
-
-  
-  //focus line
-  // var focus = chart.append("g")
-  //     .attr("class", "focus")
-  //     .style("opacity", 0.8);
-
-  //   focus.append("text")
-  //     .attr("class", "line1")
-  //     .attr("x", 6)
-  //     .attr("dy", "1em")
-  //     .attr("font-size", 12)
-  //     .attr("font-weight","bold")
-  //     .attr("font-family", "sans-serif");
-
-  //   focus.append("circle")
-  //     .attr("id", "circle-highlight")
-  //     .attr("r",4.5)
-  //     .style("fill","none")
-  //     .style("stroke", "black");
-
-  //   focus.append("line")
-  //     .classed("x", true)
-  //     .style("fill","none")
-  //     .style("stroke", "black")
-  //     .style("stroke-width", "1.5px")
-  //     .style("stroke-dasharray", "3 3");
-
-  //   focus.append("line")
-  //     .classed("y", true)
-  //     .style("fill","none")
-  //     .style("stroke", "black")
-  //     .style("stroke-width", "1.5px")
-  //     .style("stroke-dasharray", "3 3");
-  
-  //   //append a rectangle over the entire chart
-  //   //that reacts to when the mouse hovers over
-  //   chart.append("rect")
-  //       .attr("class", "overlay")
-  //       .attr("width", width)
-  //       .attr("height", height)
-  //       .style("fill","none")
-  //       .style("pointer-events", "all")
-  //       .on("mouseover", function(){ focus.style("display", null); })
-  //       .on("mouseout", function(){ focus.style("display", "none"); })
-  //       .on("mousemove", function (){
-      
-  //         //get the mouse x position
-  //         var mouseX = d3.mouse(this)[0];
-
-  //         //use x scale to calculate position 
-  //         var xData = x.invert(mouseX);
-
-  //         //calculate the x value based on each point in the data.
-  //         var bisectX = d3.bisector(function(d){return d.date;}).left;
-
-  //         //find out which data point we're closest to along the X axis
-  //         var ix = bisectX(data, xData);
-
-  //         focus.select("line.x")
-  //           .attr("x1", 0)
-  //           .attr("y1", y(data[ix].death))
-  //           .attr("x2", x(data[ix].date))
-  //           .attr("y2", y(data[ix].death));
-
-  //         focus.select("line.y")
-  //           .attr("x1", x(data[ix].date))
-  //           .attr("y1", height)
-  //           .attr("x2", x(data[ix].date))
-  //           .attr("y2", y(data[ix].death));
-
-  //         focus.select("circle")
-  //           .attr("cx", x(data[ix].date))
-  //           .attr("cy", y(data[ix].death));
-
-  //         focus.select("text")
-  //           .attr("transform", "translate(" + x(data[ix].date) + "," + y(data[ix].death) + ")")
-  //           .text("Deaths: " + data[ix].death);
-  //  });
-
-});
-</script>
+<body>    
+    
+            <div class="folium-map" id="map_3d12a7b6808a4b389e0ae962818a45da" ></div>
+        
 </body>
-</html>
+<script>    
+    
+            var map_3d12a7b6808a4b389e0ae962818a45da = L.map(
+                "map_3d12a7b6808a4b389e0ae962818a45da",
+                {
+                    center: [52.518338909067424, 13.391718307779515],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 12.5,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_c9444d1aefc04207ae0f6165822ae4bd = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_3d12a7b6808a4b389e0ae962818a45da);
+        
+    
+            L.control.fullscreen(
+                {"forceSeparateButton": true, "position": "topright", "title": "Expand me", "titleCancel": "Exit me"}
+            ).addTo(map_3d12a7b6808a4b389e0ae962818a45da);
+        
+    
+            var tile_layer_6c65c342c41f4ce394e498bfc6481bb6 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+            var mini_map_19dcc6fb700f4da5ae7ba6e13b892e53 = new L.Control.MiniMap(
+                tile_layer_6c65c342c41f4ce394e498bfc6481bb6,
+                {"autoToggleDisplay": false, "centerFixed": false, "collapsedHeight": 25, "collapsedWidth": 25, "height": 150, "minimized": false, "position": "bottomright", "toggleDisplay": false, "width": 150, "zoomAnimation": false, "zoomLevelOffset": -5}
+            );
+            map_3d12a7b6808a4b389e0ae962818a45da.addControl(mini_map_19dcc6fb700f4da5ae7ba6e13b892e53);
+        
+    
+            L.Control.geocoder(
+                {"collapsed": false, "defaultMarkGeocode": true, "position": "topright"}
+            ).on('markgeocode', function(e) {
+                map_3d12a7b6808a4b389e0ae962818a45da.setView(e.geocode.center, 11);
+            }).addTo(map_3d12a7b6808a4b389e0ae962818a45da);
+
+        
+    
+            var feature_group_6c71c76106d44e50a3dd52844cb0e422 = L.featureGroup(
+                {}
+            ).addTo(map_3d12a7b6808a4b389e0ae962818a45da);
+        
+    
+            var marker_ba1346ba31f146b1b3ed3c2d15684da1 = L.marker(
+                [52.5209, 13.4131],
+                {}
+            ).addTo(feature_group_6c71c76106d44e50a3dd52844cb0e422);
+        
+    
+        var popup_b762744606a74a5b99ad4d313e565e25 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_dee166e25f384105a7c6a472b5631679 = $(`<div id="html_dee166e25f384105a7c6a472b5631679" style="width: 100.0%; height: 100.0%;">     <b>Incident1_location:</b>Alexanderplatz     <p><b>Incident date:</b> 2021-12-15</p>     <p><b>Incident time:</b> 0730 CEST</p>     <p><b>Observations:</b></p>     <p>Video1: <a href="https://youtu.be/lXiPPU1mKHY?t=46">Bike tour</a>     </p>      <p>     Video2: <a href="https://www.youtube.com/watch?v=zGO1PgAc9eQ">Walking tour</a>     </p>     <p><i>**Remember to always open video links in a New Tab**</i></p>     </div>`)[0];
+            popup_b762744606a74a5b99ad4d313e565e25.setContent(html_dee166e25f384105a7c6a472b5631679);
+        
+
+        marker_ba1346ba31f146b1b3ed3c2d15684da1.bindPopup(popup_b762744606a74a5b99ad4d313e565e25)
+        ;
+
+        
+    
+    
+            var feature_group_4a58bc8e5281416a88819e34f388eaea = L.featureGroup(
+                {}
+            ).addTo(map_3d12a7b6808a4b389e0ae962818a45da);
+        
+    
+            var marker_af3e75c1fe53430f8558f82e5a79d35f = L.marker(
+                [52.5124, 13.3516],
+                {}
+            ).addTo(feature_group_4a58bc8e5281416a88819e34f388eaea);
+        
+    
+        var popup_ee66608513a6455992d88bd34d49b5f6 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_d9141b9631ed4c15a5c0d2cf4bcb908d = $(`<div id="html_d9141b9631ed4c15a5c0d2cf4bcb908d" style="width: 100.0%; height: 100.0%;">     <b>Incident2_location:</b>Tiergarten     <p><b>Incident date:</b> 2021-12-31</p>     <p><b>Incident time:</b> 1730 CEST</p>     <p><b>Observations:</b></p>     <p>Video1: <a href="https://www.youtube.com/watch?v=YcKSN8c-Sjg">Walking tour</a>     </p>      <p>     Video2: <a href="https://www.youtube.com/watch?v=ENgPob5Wjxs">2nd Walking tour</a>     </p>     <p><i>**Remember to always open video links in a New Tab**</i></p>     </div>`)[0];
+            popup_ee66608513a6455992d88bd34d49b5f6.setContent(html_d9141b9631ed4c15a5c0d2cf4bcb908d);
+        
+
+        marker_af3e75c1fe53430f8558f82e5a79d35f.bindPopup(popup_ee66608513a6455992d88bd34d49b5f6)
+        ;
+
+        
+    
+    
+            var feature_group_a38692830ee94835b7a0e5781047f8b6 = L.featureGroup(
+                {}
+            ).addTo(map_3d12a7b6808a4b389e0ae962818a45da);
+        
+    
+            var marker_5c3f304c6ab04df7a6cbd5c43fa83430 = L.marker(
+                [52.5073, 13.39],
+                {}
+            ).addTo(feature_group_a38692830ee94835b7a0e5781047f8b6);
+        
+    
+        var popup_7f5577bdd81342c2bc0dc38b9fec9e1d = L.popup({"maxWidth": "100%"});
+
+        
+            var html_2b522cd1fa8b4047bd1ef77da39adf97 = $(`<div id="html_2b522cd1fa8b4047bd1ef77da39adf97" style="width: 100.0%; height: 100.0%;">     <b>Incident3_location:</b>CheckpointCharlie     <p><b>Incident date:</b> 2022-01-03</p>     <p><b>Incident time:</b> 0945 CEST</p>     <p><b>Observations:</b></p>     <p>Video1: <a href="https://www.youtube.com/watch?v=bCquI4GOoF4">Historical video w/ Army soldiers</a>     </p>      <p>     Video2: <a href="https://www.youtube.com/watch?v=er7C6LuVAf0">Walking tour</a>     </p>     <p><i>**Remember to always open video links in a New Tab**</i></p>     </div>`)[0];
+            popup_7f5577bdd81342c2bc0dc38b9fec9e1d.setContent(html_2b522cd1fa8b4047bd1ef77da39adf97);
+        
+
+        marker_5c3f304c6ab04df7a6cbd5c43fa83430.bindPopup(popup_7f5577bdd81342c2bc0dc38b9fec9e1d)
+        ;
+
+        
+    
+    
+            var feature_group_0504b078ea9a48b6923bf8e87cbd7bf7 = L.featureGroup(
+                {}
+            ).addTo(map_3d12a7b6808a4b389e0ae962818a45da);
+        
+    
+            var marker_6dcf2cd4f02c4bed8eb527ac8465a47d = L.marker(
+                [52.5154, 13.4533],
+                {}
+            ).addTo(feature_group_0504b078ea9a48b6923bf8e87cbd7bf7);
+        
+    
+        var popup_8fc57749a37e4d0585f899da6f00cdc6 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_2667ec95c65446e6ae5fe78d3ad7c03f = $(`<div id="html_2667ec95c65446e6ae5fe78d3ad7c03f" style="width: 100.0%; height: 100.0%;">     <b>Incident4_location:</b>Friedrichshain     <p><b>Incident date:</b> 2022-02-03</p>     <p><b>Incident time:</b> 1215 CEST</p>     <p><b>Observations:</b></p>     <p>Video1: <a href="https://youtu.be/pLV_XZPWqMw?t=210">Car tour</a>     </p>      <p>     Video2: <a href="https://www.youtube.com/watch?v=ByNi0z6nmOo">Walking tour</a>     </p>     <p><i>**Remember to always open video links in a New Tab**</i></p>     </div>`)[0];
+            popup_8fc57749a37e4d0585f899da6f00cdc6.setContent(html_2667ec95c65446e6ae5fe78d3ad7c03f);
+        
+
+        marker_6dcf2cd4f02c4bed8eb527ac8465a47d.bindPopup(popup_8fc57749a37e4d0585f899da6f00cdc6)
+        ;
+
+        
+    
+    
+            var layer_control_9048adbfbce44b2e800f5477a3f7e5c6 = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_c9444d1aefc04207ae0f6165822ae4bd,
+                },
+                overlays :  {
+                    "Incident1: 2021-12-15" : feature_group_6c71c76106d44e50a3dd52844cb0e422,
+                    "Incident2: 2021-12-31" : feature_group_4a58bc8e5281416a88819e34f388eaea,
+                    "Incident3: 2022-01-03" : feature_group_a38692830ee94835b7a0e5781047f8b6,
+                    "Incident4: 2022-02-03" : feature_group_0504b078ea9a48b6923bf8e87cbd7bf7,
+                },
+            };
+            L.control.layers(
+                layer_control_9048adbfbce44b2e800f5477a3f7e5c6.base_layers,
+                layer_control_9048adbfbce44b2e800f5477a3f7e5c6.overlays,
+                {"autoZIndex": true, "collapsed": true, "position": "topright"}
+            ).addTo(map_3d12a7b6808a4b389e0ae962818a45da);
+        
+</script>
